@@ -1,5 +1,56 @@
 'use strict';
 
+class Notepad {
+  constructor(notes) {
+    this._notes = notes;
+  }
+
+  get notes() {
+    return this._notes;
+  }
+
+  static Priority = {
+    LOW: 0,
+    NORMAL: 1,
+    HIGH: 2,
+  };
+
+  findNoteById(id) {
+    return this._notes.find(note => note.id === id);
+  }
+
+  saveNote(note) {
+    this._notes.push(note);
+    return note;
+  }
+
+  deleteNote(id) {
+    this._notes = this._notes.filter(note => note.id !== id);
+  }
+
+  updateNoteContent(id, updatedContent) {
+    const note = this.findNoteById(id);
+    Object.assign(note, updatedContent);
+    return note;
+  }
+  updateNotePriority(id, priority) {
+    const note = this.findNoteById(id);
+    note.priority = priority;
+    return note;
+  }
+  filterNotesByQuery(query) {
+    return this._notes.filter(note => {
+      const inTitle = note.title.toLowerCase().includes(query);
+      const inBody = note.body.toLowerCase().includes(query);
+      return inTitle || inBody;
+    });
+  }
+
+  filterNotesByPriority(priority) {
+    return this._notes.filter(note => note.priority === priority);
+  }
+}
+
 const PRIORITY_TYPES = {
   LOW: 0,
   NORMAL: 1,
@@ -50,3 +101,88 @@ const initialNotes = [
     priority: PRIORITY_TYPES.LOW,
   },
 ];
+
+const notepad = new Notepad(initialNotes);
+
+const list = document.querySelector('.note-list');
+
+function createListItem(note) {
+  const li = document.createElement('li');
+  li.classList.add('note-list__item');
+  li.dataset.id = note.id;
+
+  const item = document.createElement('div');
+  item.classList.add('note');
+
+  const noteContent = createNoteContent(note);
+  const noteFooter = createNoteFooter(note);
+
+  li.append(noteContent, noteFooter);
+
+  return li;
+}
+
+function createNoteContent(note) {
+  const content = document.createElement('div');
+  content.classList.add('note__content');
+
+  const title = document.createElement('h2');
+  title.classList.add('note__title');
+  title.textContent = note.title;
+
+  const body = document.createElement('p');
+  body.textContent = note.body;
+
+  content.append(title, body);
+
+  return content;
+}
+
+function createNoteFooter(note) {
+  const footer = document.createElement('footer');
+  footer.classList.add('note__footer');
+
+  const firstSection = document.createElement('section');
+  firstSection.classList.add('note__section');
+
+  const btnDecPrior = createActionButton(
+    NOTE_ACTIONS.DECREASE_PRIORITY,
+    ICON_TYPES.ARROW_DOWN
+  );
+
+  const btnIncPrior = createActionButton(
+    NOTE_ACTIONS.INCREASE_PRIORITY,
+    ICON_TYPES.ARROW_UP
+  );
+
+  const span = document.createElement('span');
+  span.classList.add('note__priority');
+  span.textContent = `Priority: ${note.priority}`;
+
+  firstSection.append(btnDecPrior, btnIncPrior, span);
+
+  const secSection = firstSection.cloneNode();
+
+  const btnEdit = createActionButton(NOTE_ACTIONS.EDIT, ICON_TYPES.EDIT);
+  const btnDelete = createActionButton(NOTE_ACTIONS.DELETE, ICON_TYPES.DELETE);
+
+  secSection.append(btnEdit, btnDelete);
+
+  footer.append(firstSection, secSection);
+
+  return footer;
+}
+
+function createActionButton(action, text) {
+  const button = document.createElement('button');
+  button.classList.add('action');
+  button.dataset.action = action;
+
+  const i = document.createElement('i');
+  i.classList.add('material-icons', 'action__icon');
+  i.textContent = text;
+
+  button.appendChild(i);
+
+  return button;
+}
