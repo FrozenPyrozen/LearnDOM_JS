@@ -106,15 +106,21 @@ const notepad = new Notepad(initialNotes);
 
 const list = document.querySelector('.note-list');
 
-renderNoteList(list, notepad.notes);
+// renderNoteList(list, notepad.notes);
 
-
-
+renderNoteListNarkup(list, notepad.notes);
 
 function renderNoteList(listRef, notes) {
-  const res =  notes.reduce((acc, el) => acc.concat(createListItem(el)), []);
-  if(res) {
+  const res = notes.reduce((acc, el) => acc.concat(createListItem(el)), []);
+  if (res) {
     listRef.append(...res);
+  }
+}
+
+function renderNoteListNarkup(listRef, notes) {
+  const res = notes.reduce((acc, el) => acc + createListItemMarkup(el), '');
+  if (res) {
+    listRef.innerHTML += res;
   }
 }
 
@@ -197,4 +203,37 @@ function createActionButton(action, text) {
   button.appendChild(i);
 
   return button;
+}
+
+function createListItemMarkup(note) {
+  return `
+  <li class="note-list__item" data-id="${note.id}">
+  <div class="note">
+    <div class="note__content">
+      <h2 class="note__title">${note.title}</h2>
+      <p class="note__body">
+        ${note.body}
+      </p>
+    </div>
+    <footer class="note__footer">
+      <section class="note__section">
+        <button class="action" data-action="${NOTE_ACTIONS.DECREASE_PRIORITY}">
+          <i class="material-icons action__icon">${ICON_TYPES.ARROW_DOWN}</i>
+        </button>
+        <button class="action" data-action="${NOTE_ACTIONS.INCREASE_PRIORITY}">
+          <i class="material-icons action__icon">${ICON_TYPES.ARROW_UP}</i>
+        </button>
+        <span class="note__priority">Priority: ${note.priority}</span>
+      </section>
+      <section class="note__section">
+        <button class="action" data-action="${NOTE_ACTIONS.EDIT}">
+          <i class="material-icons action__icon">${ICON_TYPES.EDIT}</i>
+        </button>
+        <button class="action" data-action="${NOTE_ACTIONS.DELETE}">
+          <i class="material-icons action__icon">${ICON_TYPES.DELETE}</i>
+        </button>
+      </section>
+    </footer>
+  </div>
+</li>`;
 }
