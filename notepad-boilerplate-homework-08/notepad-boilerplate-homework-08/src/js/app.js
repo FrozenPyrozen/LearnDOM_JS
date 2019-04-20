@@ -106,6 +106,18 @@ const notepad = new Notepad(initialNotes);
 
 const list = document.querySelector('.note-list');
 
+renderNoteList(list, notepad.notes);
+
+
+
+
+function renderNoteList(listRef, notes) {
+  const res =  notes.reduce((acc, el) => acc.concat(createListItem(el)), []);
+  if(res) {
+    listRef.append(...res);
+  }
+}
+
 function createListItem(note) {
   const li = document.createElement('li');
   li.classList.add('note-list__item');
