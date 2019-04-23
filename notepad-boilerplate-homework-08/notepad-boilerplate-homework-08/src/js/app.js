@@ -106,9 +106,55 @@ const notepad = new Notepad(initialNotes);
 
 const list = document.querySelector('.note-list');
 
-// renderNoteList(list, notepad.notes);
+renderNoteList(list, notepad.notes);
 
-renderNoteListNarkup(list, notepad.notes);
+document.addEventListener('DOMContentLoaded', () => {
+  const form = document.querySelector('.note-editor');
+  const title = form.querySelector('.js-input-title');
+  const body = form.querySelector('.js-input-body');
+
+  form.addEventListener('submit', handleSubmit);
+
+  function handleSubmit(event) {
+    event.preventDefault();
+    const titleCont = title.value;
+    const bodyCont = body.value;
+
+    if (!titleCont || !bodyCont) {
+      alert('Необходимо заполнить все поля!');
+      return;
+    }
+
+    const Note = function({ title, body, priority = 0 }) {
+      this.id = generateUniqueId();
+      this.title = title;
+      this.body = body;
+      this.priority = priority;
+    };
+
+    const note = new Note({ title: titleCont, body: bodyCont });
+
+    notepad.saveNote(note);
+    addListItem(list, note);
+
+    form.reset();
+  }
+});
+
+// renderNoteListNarkup(list, notepad.notes);
+
+const generateUniqueId = () =>
+  Math.random()
+    .toString(36)
+    .substring(2, 15) +
+  Math.random()
+    .toString(36)
+    .substring(2, 15);
+
+function addListItem(listRef, note) {
+  const newNote = createListItem(note);
+  listRef.appendChild(newNote);
+}
 
 function renderNoteList(listRef, notes) {
   const res = notes.reduce((acc, el) => acc.concat(createListItem(el)), []);
