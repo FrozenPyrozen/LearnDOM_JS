@@ -112,8 +112,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const form = document.querySelector('.note-editor');
   const title = form.querySelector('.js-input-title');
   const body = form.querySelector('.js-input-body');
+  const search = document.querySelector('.search-form__input');
 
   form.addEventListener('submit', handleSubmit);
+  list.addEventListener('click', deleteNote);
+  search.addEventListener('input', filterNotes);
 
   function handleSubmit(event) {
     event.preventDefault();
@@ -139,9 +142,37 @@ document.addEventListener('DOMContentLoaded', () => {
 
     form.reset();
   }
+
+  function deleteNote(event) {
+    const el = event.target.closest('[data-action=delete-note]');
+    const note = event.target.closest('.note-list__item');
+
+    if (el === null) {
+      return;
+    }
+    removeListItem(note);
+  }
+
+  function filterNotes(event) {
+    event.preventDefault();
+
+    const target = event.target;
+
+    const value = target.value;
+    const filteredNotes = notepad.filterNotesByQuery(value);
+
+    list.innerHTML = '';
+    renderNoteList(list, filteredNotes);
+  }
+
 });
 
 // renderNoteListNarkup(list, notepad.notes);
+
+function removeListItem(note) {
+  notepad.deleteNote(note.dataset.id);
+  note.remove();
+}
 
 const generateUniqueId = () =>
   Math.random()
